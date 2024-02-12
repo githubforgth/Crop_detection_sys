@@ -1,0 +1,50 @@
+{% extends "guide.html" %}
+{% block username %}
+    {{ username }}
+{% endblock %}
+{% block title %}
+    历史记录
+{% endblock %}
+{% block context %}
+    <div class="layui-container">
+        <table class="layui-table">
+            <colgroup>
+                <col width="200">
+                <col width="100">
+                <col width="100">
+                <col width="100">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>图片展示</th>
+                    <th>时间</th>
+                    <th>res</th>
+                    <th>acc</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history_list %}
+                <tr>
+                    <td><img src="{{ item[0] }}" alt="pic"></td>
+                    <td>{{ item[2] }}</td>
+                    <td>{{ item[3] }}</td>
+                    <td>{{ item[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</script>
+{% endblock %}
+{% block script %}
+    <style>
+        /* 自定义样式 */
+        .layui-table th, .layui-table td {
+            text-align: center; /* 水平居中 */
+            vertical-align: middle; /* 垂直居中 */
+        }
+        .layui-table tbody tr {
+            min-height: 80px; /* 设置每行高度 */
+        }
+    </style>
+{% endblock %}

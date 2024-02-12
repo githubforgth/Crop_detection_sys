@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <!-- 引入 layui 的样式文件 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/layui/2.6.8/css/layui.css">
+</head>
+<body>
+
+<div class="layui-container" style="margin-top: 100px;">
+    <div class="layui-row">
+        <div class="layui-col-md6 layui-col-md-offset3">
+            <form class="layui-form" id="login-form" action="/login_info" method="post">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="phone" required lay-verify="required" placeholder="输入你的电话号码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn" lay-submit lay-filter="login">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 引入 layui 的 JS 文件 -->
+<script src="../static/layui/src/css/layui.css"></script>
+<script>
+    layui.use(['form'], function(){
+        var form = layui.form;
+
+        // 监听提交
+        form.on('submit(login)', function(data){
+            // 表单提交时的处理逻辑
+            // 这里可以使用 AJAX 将表单数据提交给后端
+            return true; // 阻止表单跳转
+        });
+    });
+</script>
+
+</body>
+</html>
