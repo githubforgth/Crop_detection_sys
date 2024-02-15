@@ -15,7 +15,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # UPLOAD CONFIG
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-model = YOLO('/home/gth/PycharmProjects/Graduation_project/ML/runs/classify/train21/weights/best.pt')
+model = YOLO('./ML/runs/classify/train21/weights/best.pt')
 table_name = 'crop'
 
 
@@ -149,7 +149,14 @@ def signup():
     password = request.args.get('password')
     confirm_password = request.args.get('confirm_password')
     if (password and confirm_password) and password == confirm_password:
-        sql_connect.sql_insert('crop', {'phonenumber': username, 'password': password})
+        sql_connect.sql_insert('crop', {'phonenumber': username, 'password': password, "username": 'Web 用户'})
+        res = sql_connect.sql_select(table_name, None, {'phonenumber': phone, 'password': password})
+        if res != ():
+            # 其他逻辑，比如跳转到用户的个人页面
+            session['phone'] = username
+            session['user_id'] = res[0][2]
+            session['username'] = res[0][0]
+        return redirect(url_for('index'))
     return render_template('signup.html')
 
 
