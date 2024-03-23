@@ -2,21 +2,21 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from ultralytics import YOLO
 from ML import detect_pic
 import os
-import sql_connect
+from sql_connect import SQLConnector
 import base64
 import uuid
+from flask_mail import Mail
 from datetime import datetime
+from config import Config
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/uploads/'
-app.secret_key = 'gth'  # 设置一个安全密钥
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
+mail = Mail(app)
+app.config.from_object(Config)
 # UPLOAD CONFIG
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 model = YOLO('./ML/runs/classify/train21/weights/best.pt')
 table_name = 'crop'
+sql_connect = SQLConnector(database='crop', password='123456', host='localhost', user='root')
 
 
 def image_to_binary(image_path):
@@ -102,7 +102,9 @@ def iframe():
     file_path = session["file_path"]
     print(file_path)
     predict_res = detect_pic(file_path, model)
-    sql_connect.sql_insert('pic_history', {'pic_name': file_path, 'user_id': int(session['user_id']), 'timestamp': datetime.now(), 'res': predict_res['class_name'], 'acc': predict_res["class_prob"]})
+    sql_connect.sql_insert('pic_history',
+                           {'pic_name': file_path, 'user_id': int(session['user_id']), 'timestamp': datetime.now(),
+                            'res': predict_res['class_name'], 'acc': predict_res["class_prob"]})
     print("Upload success!")
     return render_template("iframe.html", file_path=file_path, detect_res=predict_res)
 
@@ -140,7 +142,7 @@ def suggest():
 @app.route("/history")
 def history():
     history_list = sql_connect.sql_select('pic_history', '*', {'user_id': session['user_id']})
-    return render_template('history.html', username=session['username'], history_list = history_list)
+    return render_template('history.html', username=session['username'], history_list=history_list)
 
 
 @app.route('/signup')
@@ -150,7 +152,7 @@ def signup():
     confirm_password = request.args.get('confirm_password')
     if (password and confirm_password) and password == confirm_password:
         sql_connect.sql_insert('crop', {'phonenumber': username, 'password': password, "username": 'Web 用户'})
-        res = sql_connect.sql_select(table_name, None, {'phonenumber': phone, 'password': password})
+        res = sql_connect.sql_select(table_name, None, {'phonenumber': username, 'password': password})
         if res != ():
             # 其他逻辑，比如跳转到用户的个人页面
             session['phone'] = username

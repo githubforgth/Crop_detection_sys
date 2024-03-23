@@ -3,8 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/ML/ultralytics" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/ML/yolov7" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/labelImg" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/static/layui" vcs="Git" />
   </component>
 </project>
