@@ -4,9 +4,12 @@
 # @Author : Gao_Taiheng
 # @File : train.py
 from ultralytics import YOLO
+import torch
 
+print(torch.cuda.is_available())
 # Load a model
-model = YOLO('./runs/classify/train21/weights/best.pt')  # load a pretrained model (recommended for training)
+model = YOLO('./runs/classify/train22/weights/best.pt')  # load a pretrained model (recommended for training)
 
 # Train the model
-results = model.train(data='/home/gth/PycharmProjects/Graduation_project/ML/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)', epochs=200, imgsz=64, device='0')
+results = model.train(data='/gth/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)',
+                      epochs=300, imgsz=64, device='0')
