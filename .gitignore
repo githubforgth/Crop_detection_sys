@@ -136,4 +136,4 @@ venv.bak/
 .ropeproject
 
 # mkdocs documentation
-/uploads
+.JPG
