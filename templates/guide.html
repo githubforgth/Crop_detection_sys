@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="{{ url_for('static', filename="layui/src/css/layui.css") }}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body style="margin: 0">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black layui-font-16"><a href="/" style="color: white">农作物病虫害检测</a></div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/">首页</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/history">历史记录</a></li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                <a href="javascript:;">
+                    <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
+                    {% block username %}{% endblock %}
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/mine">个人中心</a></dd>
+                    <dd><a href="/logout">注销</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div style="height: 80px"></div>
+<div class="layui-fluid">
+    <!-- 内容主体区域 -->
+    {% block context %}{% endblock %}
+</div>
+
+<script src="{{ url_for("static", filename="layui/src/layui.js") }}"></script>
+<script>
+    //JS
+    layui.use(['element', 'layer', 'util'], function(){
+        var element = layui.element;
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.$;
+    })
+</script>
+{% block script %}{% endblock %}
+</body>
+</html>

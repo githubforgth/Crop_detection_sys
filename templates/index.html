@@ -1,0 +1,64 @@
+{% extends "guide.html" %}
+{% block username %}
+{{ username }}
+{% endblock %}
+{% block title %}
+    首页-图片检测
+{% endblock %}
+
+{% block context %}
+    <div id="result-section" class="layui-row la点击上传，或将文件拖拽到此处
+
+yui-col-space15">
+        <h3 style="margin-left: 10%;">农作物病害检测</h3>
+        <div style="width: 100px;height: 50px;"></div>
+        <div class="layui-body">
+            <form action="/predict" method="post" enctype="multipart/form-data" id="upload-form">
+                <div class="layui-upload-drag" style="display: block; margin-left: 10%; margin-right: 10%" id="ID-upload-demo-drag">
+                    <i class="layui-icon layui-icon-upload"></i>
+                    <div>点击上传，或将文件拖拽到此处</div>
+                    <div class="layui-hide" id="ID-upload-demo-preview">
+                        {#                <hr> <img id="uploaded-image" src="" alt="上传成功后渲染" style="max-width: 60%">#}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        layui.use(function () {
+            var upload = layui.upload;
+            var $ = layui.$;
+
+            function toggleVisibility(isVisible) {
+                if (isVisible) {
+                    $('#upload-form, #ID-upload-demo-drag').hide();
+                    $('#result-section').show();
+                } else {
+                    $('#upload-form, #ID-upload-demo-drag').show();
+                    $('#result-section').hide();
+                }
+            }
+
+            upload.render({
+                elem: '#ID-upload-demo-drag',
+                url: '/predict',
+                done: function (res) {
+                    if (res.error) {
+                        layer.msg(res.error, {icon: 2}); // Show error message
+                    } else {
+                        layer.msg('上传成功', {icon: 1}); // Show success message
+
+                        $('#result-section').html(
+                            '<iframe src="/iframe" style="width: 90%; height: 500px;border: 0;margin-left: 5%;"scrolling="no" ></iframe>'
+                        );
+
+                        toggleVisibility(true);
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
