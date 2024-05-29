@@ -11,5 +11,7 @@ print(torch.cuda.is_available())
 model = YOLO('./runs/classify/train22/weights/best.pt')  # load a pretrained model (recommended for training)
 
 # Train the model
-results = model.train(data='/gth/New Plant Diseases Dataset(Augmented)/New Plant Diseases Dataset(Augmented)',
-                      epochs=300, imgsz=64, device='0')
+results = model.train(data='/home/gth/Desktop/毕业设计/archive/New Plant Diseases Dataset(Augmented)/New Plant Diseases '
+                           'Dataset(Augmented)/',
+                      epochs=100, imgsz=320, device='0', cos_lr=True, workers=16,
+                      project="../run/train1")

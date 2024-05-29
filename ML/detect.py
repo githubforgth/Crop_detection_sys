@@ -8,7 +8,7 @@ from ultralytics import YOLO
 
 # Load a model
 model = YOLO(
-    '/home/gth/PycharmProjects/Graduation_project/ML/runs/classify/train20/weights/best.pt')  # pretrained YOLOv8n model
+    '/home/gth/PycharmProjects/Graduation_project/ML/runs/classify/train23/weights/best.pt')  # pretrained YOLOv8n model
 
 
 def detect_pic(pic_path: str, model):

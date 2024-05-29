@@ -2,68 +2,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注册页面</title>
-    <!-- 引入 Layui CSS -->
+    <title>🚀注册页面</title>
+    <!-- 引入 Layui 的样式文件 -->
     <link rel="stylesheet" href="../static/layui/src/css/layui.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('../static/image/bg.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .signup-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .signup-box {
+            background-color: rgba(255, 255, 255, 0.2); /* 设置背景为白色并且带有透明度 */
+            backdrop-filter: blur(10px); /* 添加模糊效果 */
+            padding: 40px; /* 增加填充，使框体更大 */
+            border-radius: 10px;
+            width: 500px; /* 增加框体宽度 */
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* 添加阴影效果 */
+        }
+
+        .signup-box h2 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 20px; /* 增加输入框间距 */
+            text-align: left; /* 标签文本靠左 */
+        }
+
+        .layui-form-label {
+            color: #fff;
+        }
+
+        .layui-input {
+            background-color: rgba(255, 255, 255, 0.7); /* 设置输入框背景为白色并且带有透明度 */
+            border: none;
+            padding: 15px; /* 增加填充 */
+            border-radius: 5px;
+            width: 80%; /* 设置输入框宽度 */
+            margin: 0 auto; /* 居中对齐 */
+            display: block; /* 使输入框成为块元素 */
+        }
+
+        .layui-btn {
+            background: linear-gradient(to right, #5FFfaa, #5FFF7B78);
+            border: none;
+            padding: 15px 0; /* 增加填充 */
+            color: #fff;
+            border-radius: 5px;
+            width: 80%; /* 设置按钮宽度 */
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 20px auto; /* 居中对齐并增加间距 */
+            display: flex; /* 使用 flex 布局 */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+        }
+
+        .layui-btn:hover {
+            background: linear-gradient(to right, #0fffde, #5FBF8F);
+        }
+
+        .signup-box a {
+            color: #fff;
+            display: block;
+            margin-top: 10px; /* 增加链接上方间距 */
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 5%;
+            background-color: rgba(255, 255, 255, 0.2); /* 设置背景为白色并且带有透明度 */
+            backdrop-filter: blur(10px); /* 添加模糊效果 */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* 添加阴影效果 */
+            color: #fff;
+            font-size: 13px;
+        }
+    </style>
 </head>
-<body style="padding: 20px;">
-    <div class="layui-container">
-        <form class="layui-form" action="/signup">
+<body>
+
+<div class="signup-container">
+    <div class="signup-box">
+        <h2>注  册</h2>
+        <form class="layui-form" id="signup-form" action="/signup" method="post">
             <div class="layui-form-item">
                 <label class="layui-form-label">用户名</label>
                 <div class="layui-input-block">
-                    <input type="text" name="username" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+                    <input type="text" name="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">密码</label>
                 <div class="layui-input-block">
-                    <input type="password" name="password" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                    <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">确认密码</label>
                 <div class="layui-input-block">
-                        <input type="password" name="confirm_password" lay-verify="required|confirm_pass" placeholder="请确认密码" autocomplete="off" class="layui-input">
+                    <input type="password" name="confirm_password" required lay-verify="required|confirm_pass" placeholder="请确认密码" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
                 <div class="layui-input-block">
                     <button class="layui-btn" lay-submit lay-filter="register">立即注册</button>
-                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
                 </div>
             </div>
         </form>
+        <a href="/login">已有账户？去登录</a>
     </div>
+</div>
 
-    <!-- 引入 Layui JS -->
-    <script src="https://cdn.staticfile.org/layui/2.6.8/layui.js"></script>
-    <script>
-        layui.use(['form', 'layer'], function(){
-            var form = layui.form;
-            var layer = layui.layer;
+<div class="footer">
+    作者: Your Name
+</div>
 
-            // 自定义验证规则
-            form.verify({
-                confirm_pass: function(value, item) {
-                    var password = $('input[name="password"]').val();
-                    if (value !== password) {
-                        return '两次密码输入不一致';
-                    }
+<!-- 引入 layui 的 JS 文件 -->
+<script src="../static/layui/layui.js"></script>
+<script>
+    layui.use(['form'], function(){
+        var form = layui.form;
+
+        // 自定义验证规则
+        form.verify({
+            confirm_pass: function(value, item) {
+                var password = $('input[name="password"]').val();
+                if (value !== password) {
+                    return '两次密码输入不一致';
                 }
-            });
-
-            // 监听提交
-            form.on('submit(register)', function(data){
-                // 提交表单的异步请求示例（未实际提交）
-                layer.alert(JSON.stringify(data.field), {
-                    title: '注册信息',
-                    icon: 1
-                });
-                return false; // 阻止表单跳转
-            });
+            }
         });
-    </script>
+
+        // 监听提交
+        form.on('submit(register)', function(data){
+            // 表单提交时的处理逻辑
+            // 这里可以使用 AJAX 将表单数据提交给后端
+            return true; // 阻止表单跳转
+        });
+    });
+</script>
+
 </body>
 </html>
