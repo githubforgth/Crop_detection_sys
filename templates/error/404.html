@@ -1,0 +1,45 @@
+<!-- templates/404.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 5em;
+        }
+        p {
+            font-size: 1.5em;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>这里是一片荒芜，让我们一起返回 “home” 吧</p>
+        <p><a href="{{ url_for('index') }}">返回首页</a></p>
+    </div>
+</body>
+</html>

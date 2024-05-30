@@ -1,0 +1,44 @@
+{% extends "guide.html" %}
+{% block username %}
+{{ username }}
+{% endblock %}
+{% block title %}
+{{ disease_name }} 建议
+{% endblock %}
+
+{% block context %}
+<div id="advice-section" class="layui-row layui-col-space15" style="font-family: Arial, sans-serif; color: #333;">
+    <h3 style="margin-left: 10%; font-size: 24px; color: #4CAF50;">病虫害防治建议</h3>
+    <div style="width: 100px; height: 50px;"></div>
+    <div class="layui-body" style="margin-left: 10%; margin-right: 10%;">
+        <div class="layui-card" style="border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <div class="layui-card-header" style="background-color: #f8f8f8; font-weight: bold; font-size: 18px;">病虫害信息</div>
+            <div class="layui-card-body" style="padding: 20px;">
+                <p style="font-size: 16px;">- <strong>{{ disease_name }}</strong></p>
+            </div>
+        </div>
+        <div style="width: 100px; height: 30px;"></div>
+        <div class="layui-card" style="border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <div class="layui-card-header" style="background-color: #f8f8f8; font-weight: bold; font-size: 18px;">建议措施</div>
+            <div class="layui-card-body" style="padding: 20px; line-height: 1.6;">
+                <div id="markdown-content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    layui.use(['element'], function () {
+        var element = layui.element;
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var markdownContent = {{ context|tojson|safe }};
+        var htmlContent = marked.parse(markdownContent);  // 使用 marked.parse 解析 Markdown 内容
+        document.getElementById('markdown-content').innerHTML = htmlContent;
+    });
+</script>
+{% endblock %}

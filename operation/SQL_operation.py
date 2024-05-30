@@ -36,6 +36,15 @@ class MySQLHelper:
             self.connection.rollback()
             return False
 
+    def get_all_users(self):
+        query = "SELECT * FROM crop"
+        return self.execute_query(query)
+
+    def add_advice(self, disease_name, advice_content):
+        query = "INSERT INTO advice (disease_name, advice_content) VALUES (%s, %s)"
+        data = (disease_name, advice_content)
+        return self.execute_update(query, data)
+
     def close_connection(self):
         self.cursor.close()
         self.connection.close()

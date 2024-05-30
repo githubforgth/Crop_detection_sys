@@ -1,0 +1,48 @@
+<!-- view_users.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>用户管理</h1>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>User Class</th>
+            <th>History</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phonenumber }}</td>
+            <td>{{ user.user_class }}</td>
+            <td>{{ user.history }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

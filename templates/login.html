@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚀Login Page</title>
     <!-- 引入 layui 的样式文件 -->
-    <link rel="stylesheet" href="../static/layui/src/css/layui.css">
+    <link rel="stylesheet" href="//www.layuicdn.com/layui-v2.7.6/css/layui.css">
     <style>
         body, html {
             height: 100%;
@@ -24,16 +24,18 @@
             justify-content: center;
             align-items: center;
             flex-grow: 1;
+            padding: 20px;
         }
 
         .login-box {
-            background-color: rgba(255, 255, 255, 0.2); /* 设置背景为白色并且带有透明度 */
-            backdrop-filter: blur(10px); /* 添加模糊效果 */
-            padding: 40px; /* 增加填充，使框体更大 */
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 40px;
             border-radius: 10px;
-            width: 500px; /* 增加框体宽度 */
+            width: 100%;
+            max-width: 500px;
             text-align: center;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* 添加阴影效果 */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
         }
 
         .login-box h2 {
@@ -42,7 +44,7 @@
         }
 
         .layui-form-item {
-            margin-bottom: 20px; /* 增加输入框间距 */
+            margin-bottom: 20px;
         }
 
         .layui-form-label {
@@ -50,28 +52,27 @@
         }
 
         .layui-input {
-            background-color: rgba(255, 255, 255, 0.7); /* 设置输入框背景为白色并且带有透明度 */
+            background-color: rgba(255, 255, 255, 0.7);
             border: none;
-            padding: 15px; /* 增加填充 */
+            padding: 15px;
             border-radius: 5px;
-            width: 80%; /* 设置输入框宽度 */
-            margin: 0 auto; /* 居中对齐 */
-            display: block; /* 使输入框成为块元素 */
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .layui-btn {
             background: linear-gradient(to right, #5FFfaa, #5FFF7B78);
             border: none;
-            padding: 15px 0; /* 增加填充 */
+            padding: 15px 0;
             color: #fff;
             border-radius: 5px;
-            width: 80%; /* 设置按钮宽度 */
+            width: 100%;
             cursor: pointer;
             transition: background 0.3s ease;
-            margin: 20px auto; /* 居中对齐并增加间距 */
-            display: flex; /* 使用 flex 布局 */
-            justify-content: center; /* 水平居中 */
-            align-items: center; /* 垂直居中 */
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .layui-btn:hover {
@@ -81,7 +82,7 @@
         .login-box a {
             color: #fff;
             display: block;
-            margin-top: 10px; /* 增加链接上方间距 */
+            margin-top: 10px;
         }
 
         .footer {
@@ -89,11 +90,21 @@
             justify-content: center;
             align-items: center;
             height: 5%;
-            background-color: rgba(255, 255, 255, 0.2); /* 设置背景为白色并且带有透明度 */
-            backdrop-filter: blur(10px); /* 添加模糊效果 */
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* 添加阴影效果 */
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
             color: #fff;
             font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 20px;
+            }
+
+            .layui-btn {
+                padding: 10px 0;
+            }
         }
     </style>
 </head>
@@ -128,9 +139,6 @@
 </div>
 
 <!-- 引入 layui 的 JS 文件 -->
-
-</body>
-</html>
 <script src="//www.layuicdn.com/layui-v2.7.6/layui.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -141,32 +149,29 @@
 
         // 监听提交
         form.on('submit(login)', function(data){
-            // 表单提交时的处理逻辑
-            // 这里可以使用 AJAX 将表单数据提交给后端
             $.ajax({
                 url: '/login_info',
                 method: 'POST',
                 data: data.field,
                 success: function(response) {
-                    // 后端返回成功，直接重定向
-                    window.location.href = '/';
+                    if (response.success) {
+                        window.location.href = '/';
+                    } else {
+                        layer.msg(response.message, {icon: 5});
+                    }
                 },
                 error: function(xhr, status, error) {
-                    // 后端返回失败，检查状态码
-                    console.log(xhr.status);
                     if (xhr.status === 401) {
-                        // Unauthorized - show error message
                         var errorMessage = JSON.parse(xhr.responseText).message;
                         layer.msg(errorMessage, {icon: 5});
                     } else {
-                        // Other error - show generic error message
                         layer.msg('登录失败，请重试', {icon: 5});
                     }
                 }
             });
-
-            // 阻止表单的默认提交行为
-            return false;
+            return false; // 阻止表单的默认提交行为
         });
     });
 </script>
+</body>
+</html>

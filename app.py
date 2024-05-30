@@ -1,26 +1,40 @@
 import os
 import base64
 import uuid
-
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
-from flask_admin import Admin
-from ultralytics import YOLO
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from flask_mail import Mail
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_admin import Admin
+from ultralytics import YOLO
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 from config import Config
+from src.config import crop_disease
 from ML import detect_pic
-from sql_connect import SQLConnector
+from blueprint.admin import admin_bp, helper
+from user_model import User
 
 app = Flask(__name__)
-mail = Mail(app)
 app.config.from_object(Config)
 app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
-admin = Admin(app, name='admin', template_mode='bootstrap3')
+app.secret_key = 'your_secret_key'
+
+mail = Mail(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login_page'
+login_manager.login_message = "Please log in to access this page."
+admin = Admin(app, template_mode='bootstrap3', name='Admin')
+
+app.register_blueprint(admin_bp)
 
 model = YOLO('./run/train1/train3/weights/best.pt')
-table_name = 'crop'
-sql_connect = SQLConnector(database='crop', password='123456', host='localhost', user='root')
+sql_connect = helper
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 def image_to_binary(image_path):
@@ -30,13 +44,17 @@ def image_to_binary(image_path):
 
 
 def generate_random_filename():
-    random_filename = str(uuid.uuid4())
-    return random_filename
+    return str(uuid.uuid4())
 
 
 def allowed_file(filename):
-    ALLOWED_EXTENSIONS = {'.png', 'jpg', 'jpeg', 'blm'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'blm'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error/404.html'), 404
 
 
 @app.route('/login')
@@ -48,26 +66,27 @@ def login_page():
 def login():
     phone = request.form.get('phone')
     password = request.form.get('password')
-
-    res = sql_connect.sql_select(table_name, None, {'phonenumber': phone, 'password': password})
-    if res:
+    res = sql_connect.sql_select('crop', None, {'phonenumber': phone})
+    print(res, password)
+    if res and check_password_hash(res[0]['password'], password):
+        user = User.get(res[0]['userid'])
+        login_user(user)
         session['phone'] = phone
-        session['user_id'] = res[0][2]
-        session['username'] = res[0][0]
-        return redirect(url_for('index'))
+        session['user_id'] = res[0]['userid']
+        session['username'] = res[0]['username']
+        return jsonify({"success": True, "message": "登陆成功"})
     else:
-        return jsonify({'message': '账号或密码输入错误'}), 401
-        # return '<script> alert("账号或密码输入错误");window.open(127.0.0.1:5000/login);;</script>'
+        return jsonify({"success": False, "message": "账号密码错误，请重试"}), 401
 
 
 @app.route('/')
+@login_required
 def index():
-    if 'username' not in session:
-        return redirect(url_for('login_page'))
-    return render_template('index.html', username=session['username'])
+    return render_template('index.html', username=current_user.username)
 
 
 @app.route("/predict", methods=["POST"])
+@login_required
 def predict_picture():
     if "file" not in request.files:
         return jsonify({"error": "No file provided"})
@@ -90,79 +109,108 @@ def predict_picture():
 
 
 @app.route("/iframe", methods=["GET", "POST"])
+@login_required
 def iframe():
     file_path = session.get("file_path")
     if file_path:
         predict_res = detect_pic(file_path, model)
-        sql_connect.sql_insert('pic_history', {'pic_name': file_path, 'user_id': int(session['user_id']),
-                                               'timestamp': datetime.now(), 'res': predict_res['class_name'],
-                                               'acc': predict_res["class_prob"]})
-        return render_template("iframe.html", file_path=file_path, detect_res=predict_res)
+        sql_connect.sql_insert('pic_history', {
+            'pic_name': file_path,
+            'user_id': int(session['user_id']),
+            'timestamp': datetime.now(),
+            'res': crop_disease[predict_res['class_name']],
+            'acc': predict_res["class_prob"]
+        })
+        return render_template("iframe.html", file_path=file_path, detect_res=predict_res,
+                               res=crop_disease[predict_res['class_name']])
     else:
         return jsonify({"error": "File path not found"})
 
 
 @app.route("/mine")
+@login_required
 def mine():
-    return render_template("mine.html", username=session.get('username'))
+    return render_template("mine.html", username=current_user.username)
 
 
 @app.route("/Change_info", methods=["POST"])
+@login_required
 def change_info():
     email = request.values.get("email")
     phone = request.values.get("phone")
     password = request.values.get("password")
     vercode = request.values.get("vercode")
-
-    data_to_update = {'email': email, 'phonenumber': phone, 'password': password}
-    sql_connect.sql_update(table_name, data_to_update, where={"phonenumber": phone})
+    hashed_password = generate_password_hash(password)
+    data_to_update = {'email': email, 'phonenumber': phone, 'password': hashed_password}
+    sql_connect.sql_update('crop', data_to_update, where={"phonenumber": phone})
     return jsonify({'state': 'Alter success'})
 
 
-@app.route("/user/admin")
-def admin_page():
-    return render_template("admin.html", username=session.get('username'))
-
-
-@app.route("/suggest")
-def suggest():
-    pass
-    return ""
-
-
 @app.route("/history")
+@login_required
 def history():
     if 'user_id' in session:
         history_list = sql_connect.sql_select('pic_history', '*', {'user_id': session['user_id']})
-        return render_template('history.html', username=session['username'], history_list=history_list)
+        return render_template('history.html', username=current_user.username, history_list=history_list)
     else:
         return redirect(url_for('login_page'))
+
+
+@app.route('/advice', methods=['GET', "POST"])
+@login_required
+def advice_search():
+    if request.method == 'POST':
+        disease_name = request.form.get('disease_name')
+        res = sql_connect.sql_select('advice', None, {'title': disease_name})
+        if res:
+            return render_template('advice.html', disease_name=disease_name, context=res[0]['content'])
+        else:
+            return jsonify({"error": "Disease not found"}), 404
+    else:
+        return render_template('advice.html')
+
+
+@app.route('/advice/<disease_name>', methods=['GET'])
+@login_required
+def advice(disease_name):
+    res = sql_connect.sql_select('advice', None, {'title': disease_name})
+    if res:
+        return render_template('advice.html', disease_name=disease_name, context=res[0]['content'])
+    else:
+        return jsonify({"error": "Disease not found"}), 404
 
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         username = request.form.get('username')
+        phone = request.form.get('phone')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         if password and confirm_password and password == confirm_password:
-            sql_connect.sql_insert('crop', {'phonenumber': username, 'password': password, "username": 'Web 用户'})
-            res = sql_connect.sql_select(table_name, None, {'phonenumber': username, 'password': password})
-            if res:
-                session['phone'] = username
-                session['user_id'] = res[0][2]
-                session['username'] = res[0][0]
-                return redirect(url_for('index'))
-        return render_template('signup.html', error="Passwords do not match")
+            if not sql_connect.sql_select('crop', None, {'phonenumber': phone}):
+                hashed_password = generate_password_hash(password)
+                sql_connect.sql_insert('crop',
+                                       {'username': username, 'phonenumber': username, 'password': hashed_password})
+                res = sql_connect.sql_select('crop', None, {'phonenumber': username, 'password': hashed_password})
+                if res:
+                    user = User.get(res[0]['userid'])
+                    login_user(user)
+                    session['phone'] = phone
+                    session['user_id'] = res[0]['userid']
+                    session['username'] = res[0]['username']
+                    return redirect(url_for('index'))
+            flash("账户已存在", 'danger')
+        else:
+            flash("两次输入密码不相同", 'danger')
     return render_template('signup.html')
 
 
 @app.route('/logout')
+@login_required
 def logout():
-    # 清除会话信息
-    session.pop('username', None)
-    session.pop('user_id', None)
-    session.pop('phone', None)
+    logout_user()
+    session.clear()
     return redirect(url_for('login_page'))
 
 

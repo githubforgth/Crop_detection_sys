@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advice Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        .search-container button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            border: none;
+            background-color: #5fffa8;
+            color: #333;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            margin: 20px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            border-radius: 10px 10px 0 0;
+            width: 100%;
+        }
+
+        .container {
+            padding: 10px;
+        }
+
+        .container h4 {
+            margin: 10px 0;
+        }
+
+        .container p {
+            color: #666;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .author img {
+            border-radius: 50%;
+            width: 40px;
+            margin-right: 10px;
+        }
+
+        .author span {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <input type="text" id="search-box" placeholder="Search for advice...">
+    <button onclick="search()">Search</button>
+</div>
+
+<div class="cards">
+    <!-- Example card -->
+    <div class="card">
+        <img src="https://via.placeholder.com/300x150" alt="Django">
+        <div class="container">
+            <h4><b>Django入门——初步认识</b></h4>
+            <p>Django是一个强大的Python Web(网络)框架，主要用于快速开发复杂的数据库驱动的网站。前期知识Django的特点：ORM：Django有一套强大的ORM，运行开发者通过Python代码来对数据库模型进行操作，使数据库的操作变得容易。MVC架构：Djang...</p>
+            <div class="author">
+                <img src="https://via.placeholder.com/40" alt="Author">
+                <span>Gaoth 发布于二月 22, 2024</span>
+            </div>
+        </div>
+    </div>
+    <!-- More cards will be inserted dynamically -->
+</div>
+
+<script>
+    function search() {
+        const query = document.getElementById('search-box').value;
+        fetch(`/advice?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const cardsContainer = document.getElementById('cards-container');
+                cardsContainer.innerHTML = '';  // Clear previous results
+                data.forEach(item => {
+                    if (item.title.includes(query)) {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <img src="${item.image_url}" alt="${item.title}">
+                            <div class="container">
+                                <h4><b>${item.title}</b></h4>
+                                <p>${item.description}</p>
+                                <div class="author">
+                                    <img src="https://via.placeholder.com/40" alt="Author">
+                                    <span>${item.author} 发布于 ${new Date(item.date).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        `;
+                        cardsContainer.appendChild(card);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching advice:', error));
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!-- add_advice.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Advice</title>
+</head>
+<body>
+    <h1>Add Advice</h1>
+    <form action="{{ url_for('admin.add_advice') }}" method="post">
+        <label for="disease_name">Disease Name:</label><br>
+        <input type="text" id="disease_name" name="disease_name"><br>
+        <label for="advice_content">Advice Content:</label><br>
+        <textarea id="advice_content" name="advice_content" rows="4" cols="50"></textarea><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
