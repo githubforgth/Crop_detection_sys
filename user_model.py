@@ -3,11 +3,12 @@ from sql_connect import SQLConnector
 
 
 class User(UserMixin):
-    def __init__(self, id, username, phone, password):
+    def __init__(self, id, username, phone, password, user_class):
         self.id = id
         self.username = username
         self.phone = phone
-        self.password = password  # Store hashed password
+        self.password = password
+        self.user_class = user_class  # 添加 user_class 属性
 
     @staticmethod
     def get(user_id):
@@ -16,7 +17,7 @@ class User(UserMixin):
         if user_data:
             user_info = user_data[0]
             return User(id=user_info['userid'], username=user_info['username'], phone=user_info['phonenumber'],
-                        password=user_info['password'])
+                        password=user_info['password'], user_class=user_info['user_class'])
         return None
 
     @staticmethod
@@ -26,5 +27,8 @@ class User(UserMixin):
         if user_data:
             user_info = user_data[0]
             return User(id=user_info['userid'], username=user_info['username'], phone=user_info['phonenumber'],
-                        password=user_info['password'])
+                        password=user_info['password'], user_class=user_info['user_class'])
         return None
+
+    def is_admin(self):
+        return self.user_class == 'manage'

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='layui/dist/css/layui.css') }}">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        .flashes {
+            list-style-type: none;
+            padding: 0;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .flashes li {
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2F4056;
+            color: #fff;
+            padding-top: 60px;
+            flex-shrink: 0;
+            height: 100vh;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .layui-table td, .layui-table th {
+            text-align: center;
+        }
+
+        .layui-btn {
+            margin: 5px 0;
+        }
+
+        .layui-layer-content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+        <li class="layui-nav-item layui-nav-title"><a href="#">后台管理系统</a></li>
+        <li class="layui-nav-item"><a href="/">首页</a></li>
+        <li class="layui-nav-item"><a href="{{ url_for('admin_bp.manage_users') }}">用户管理</a></li>
+        <li class="layui-nav-item"><a href="javascript:;">GitHub</a></li>
+    </ul>
+</div>
+
+<div class="content">
+    <div class="container">
+        <h1>用户管理</h1>
+        <!-- 显示 flash 消息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <table class="layui-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户名</th>
+                    <th>电话号码</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.userid }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.phonenumber }}</td>
+                        <td>
+                            <button class="layui-btn layui-btn-normal edit-btn" data-id="{{ user.userid }}" data-username="{{ user.username }}" data-phone="{{ user.phonenumber }}" data-password="{{ user.password }}">编辑</button>
+                            <form action="{{ url_for('admin_bp.delete_user', user_id=user.userid) }}" method="post" style="display:inline;">
+                                <button type="submit" class="layui-btn layui-btn-danger">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button class="layui-btn" id="add-user-btn">添加新用户</button>
+    </div>
+</div>
+
+<!-- 编辑/添加用户的模态框 -->
+<div id="user-modal" style="display:none;">
+    <form id="user-form" class="layui-form" method="post" action="{{ url_for('admin_bp.manage_users') }}">
+        <input type="hidden" name="user_id" id="user_id">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" id="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电话号码</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone" id="phone" required lay-verify="required" placeholder="请输入电话号码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="password" id="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn">保存</button>
+                <button type="button" class="layui-btn layui-btn-primary" id="cancel-btn">取消</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='layui/dist/layui.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+layui.use(['form', 'layer', 'element'], function(){
+    var form = layui.form;
+    var layer = layui.layer;
+    var element = layui.element;
+
+    // 监听添加新用户按钮点击事件
+    document.getElementById('add-user-btn').addEventListener('click', function() {
+        document.getElementById('user-form').reset();
+        document.getElementById('user_id').value = '';
+        layer.open({
+            type: 1,
+            title: '添加新用户',
+            content: $('#user-modal'),
+            area: ['500px', '400px']
+        });
+    });
+
+    // 监听编辑按钮点击事件
+    $('.edit-btn').on('click', function() {
+        var id = $(this).data('userid');
+        var username = $(this).data('username');
+        var phone = $(this).data('phone');
+        var password = $(this).data('password');
+
+        $('#user_id').val(id);
+        $('#username').val(username);
+        $('#phone').val(phone);
+        $('#password').val(password);
+
+        layer.open({
+            type: 1,
+            title: '编辑用户',
+            content: $('#user-modal'),
+            area: ['500px', '400px']
+        });
+    });
+
+    // 监听取消按钮点击事件
+    document.getElementById('cancel-btn').addEventListener('click', function() {
+        layer.closeAll();
+    });
+});
+
+// 自动隐藏flash消息
+$(document).ready(function() {
+    setTimeout(function() {
+        $('.flashes').fadeOut('slow');
+    }, 5000); // 5秒后消息消失
+});
+</script>
+</body>
+</html>

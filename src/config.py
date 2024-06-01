@@ -1,6 +1,6 @@
 crop_disease = {
     'Tomato___Early_blight': "番茄 早疫病",
-    'Potato___Late_blight': "土豆 晚疫病",
+        'Potato___Late_blight': "土豆 晚疫病",
     'Blueberry___healthy': "健康 蓝莓",
     'Tomato___Leaf_Mold': "番茄 叶霉病",
     'Corn_(maize)___Northern_Leaf_Blight': "玉米 北部叶斑病",

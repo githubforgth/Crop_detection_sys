@@ -23,7 +23,6 @@ app.secret_key = 'your_secret_key'
 mail = Mail(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login_page'
-login_manager.login_message = "Please log in to access this page."
 admin = Admin(app, template_mode='bootstrap3', name='Admin')
 
 app.register_blueprint(admin_bp)
@@ -130,20 +129,30 @@ def iframe():
 @app.route("/mine")
 @login_required
 def mine():
-    return render_template("mine.html", username=current_user.username)
+    res = sql_connect.sql_select('crop', None, {'userid': session['user_id']})
+    return render_template("mine.html",
+                           username=current_user.username,
+                           email=res[0]['email'] if res[0]['email'] else "email",
+                           phone=res[0]['phonenumber'],
+                           )
 
 
 @app.route("/Change_info", methods=["POST"])
 @login_required
 def change_info():
+    res = sql_connect.sql_select('crop', None, {'userid': session['user_id']})
     email = request.values.get("email")
     phone = request.values.get("phone")
+    user_name = request.values.get("username")
     password = request.values.get("password")
     vercode = request.values.get("vercode")
+    if phone != res[0]['phonenumber']:
+        flash('手机号已存在，请确认输入的手机号是否是正确的', 'error')
+        return redirect(url_for('mine'))
     hashed_password = generate_password_hash(password)
-    data_to_update = {'email': email, 'phonenumber': phone, 'password': hashed_password}
+    data_to_update = {'email': email, 'phonenumber': phone, 'password': hashed_password, 'username': user_name}
     sql_connect.sql_update('crop', data_to_update, where={"phonenumber": phone})
-    return jsonify({'state': 'Alter success'})
+    return jsonify({'state': '修改成功'})
 
 
 @app.route("/history")
@@ -200,7 +209,8 @@ def signup():
                     session['user_id'] = res[0]['userid']
                     session['username'] = res[0]['username']
                     return redirect(url_for('index'))
-            flash("账户已存在", 'danger')
+            else:
+                flash("账户已存在", 'danger')
         else:
             flash("两次输入密码不相同", 'danger')
     return render_template('signup.html')
