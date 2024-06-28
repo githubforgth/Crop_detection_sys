@@ -1,0 +1,2 @@
+                  epoch,             train/loss,  metrics/accuracy_top1,  metrics/accuracy_top5,               val/loss,                 lr/pg0,                 lr/pg1,                 lr/pg2
+                      1,                 2.5704,                0.70698,                0.96272,                 3.1011,              0.0033326,              0.0033326,              0.0033326

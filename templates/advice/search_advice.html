@@ -1,0 +1,47 @@
+{% extends "guide.html" %}
+
+{% block username %}
+{{ username }}
+{% endblock %}
+
+{% block title %}
+搜索建议
+{% endblock %}
+
+{% block context %}
+<div class="container">
+    <h1>搜索建议</h1>
+    <div class="search-bar">
+        <form method="GET" action="{{ url_for('search_advice') }}">
+            <input type="text" name="q" placeholder="搜索建议" value="{{ query }}" class="layui-input" style="width: 300px; display: inline-block;">
+            <button type="submit" class="layui-btn">搜索</button>
+        </form>
+    </div>
+    <table class="layui-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>标题</th>
+                <th>内容</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for advice in advices %}
+            <tr>
+                <td>{{ advice.id }}</td>
+                <td><a href="{{ url_for('advice', disease_name=advice.title) }}">{{ advice.title }}</a></td>
+                <td>{{ advice.content }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('search_advice', q=query, page=page-1) }}">上一页</a>
+        {% endif %}
+        {% if page * per_page < total %}
+            <a href="{{ url_for('search_advice', q=query, page=page+1) }}">下一页</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

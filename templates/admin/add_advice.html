@@ -1,20 +1,51 @@
-<!-- add_advice.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Advice</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
 </head>
 <body>
-    <h1>Add Advice</h1>
-    <form action="{{ url_for('admin.add_advice') }}" method="post">
-        <label for="disease_name">Disease Name:</label><br>
-        <input type="text" id="disease_name" name="disease_name"><br>
-        <label for="advice_content">Advice Content:</label><br>
-        <textarea id="advice_content" name="advice_content" rows="4" cols="50"></textarea><br>
-        <input type="submit" value="Submit">
-    </form>
+    <div class="container mt-5">
+        <h1 class="mb-4">增加建议</h1>
+        <form action="{{ url_for('admin_bp.add_advices') }}" method="post">
+            <div class="form-group">
+                <label for="disease_name">病虫害名称:</label>
+                <input type="text" class="form-control" id="disease_name" name="disease_name" required>
+            </div>
+            <div class="form-group">
+                <label for="advice_content">建议内容:</label>
+                <textarea class="form-control" id="advice_content" name="advice_content" rows="4" required></textarea>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" onclick="window.history.back();">返回</button>
+                <button type="submit" class="btn btn-primary">提交</button>
+            </div>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

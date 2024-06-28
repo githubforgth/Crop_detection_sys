@@ -66,7 +66,7 @@ def login():
     phone = request.form.get('phone')
     password = request.form.get('password')
     res = sql_connect.sql_select('crop', None, {'phonenumber': phone})
-    print(res, password)
+    print(res, password, phone)
     if res and check_password_hash(res[0]['password'], password):
         user = User.get(res[0]['userid'])
         login_user(user)
@@ -81,7 +81,7 @@ def login():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html', username=current_user.username)
+    return render_template('index.html', username=current_user.username, is_admin=current_user.is_admin)
 
 
 @app.route("/predict", methods=["POST"])
@@ -121,7 +121,7 @@ def iframe():
             'acc': predict_res["class_prob"]
         })
         return render_template("iframe.html", file_path=file_path, detect_res=predict_res,
-                               res=crop_disease[predict_res['class_name']])
+                               res=crop_disease[predict_res['class_name']], is_admin=current_user.is_admin)
     else:
         return jsonify({"error": "File path not found"})
 
@@ -134,6 +134,7 @@ def mine():
                            username=current_user.username,
                            email=res[0]['email'] if res[0]['email'] else "email",
                            phone=res[0]['phonenumber'],
+                           is_admin=current_user.is_admin
                            )
 
 
@@ -160,7 +161,8 @@ def change_info():
 def history():
     if 'user_id' in session:
         history_list = sql_connect.sql_select('pic_history', '*', {'user_id': session['user_id']})
-        return render_template('history.html', username=current_user.username, history_list=history_list)
+        print(history_list)
+        return render_template('history.html', username=current_user.username, history_list=history_list, is_admin=current_user.is_admin)
     else:
         return redirect(url_for('login_page'))
 
@@ -176,7 +178,7 @@ def advice_search():
         else:
             return jsonify({"error": "Disease not found"}), 404
     else:
-        return render_template('advice.html')
+        return render_template('advice.html', is_admin=current_user.is_admin)
 
 
 @app.route('/advice/<disease_name>', methods=['GET'])
@@ -184,7 +186,7 @@ def advice_search():
 def advice(disease_name):
     res = sql_connect.sql_select('advice', None, {'title': disease_name})
     if res:
-        return render_template('advice.html', disease_name=disease_name, context=res[0]['content'])
+        return render_template('advice.html', disease_name=disease_name, context=res[0]['content'], is_admin=current_user.is_admin)
     else:
         return jsonify({"error": "Disease not found"}), 404
 
@@ -222,6 +224,20 @@ def logout():
     logout_user()
     session.clear()
     return redirect(url_for('login_page'))
+
+
+@app.route('/search-advice', methods=['GET'])
+@login_required
+def search_advice():
+    if not current_user.is_admin:
+        return redirect(url_for('login_page'))
+
+    query = request.args.get('q', '')
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+
+    advices, total = helper.search_advices(query, page, per_page)
+    return render_template('advice/search_advice.html', advices=advices, query=query, page=page, total=total, per_page=per_page, is_admin=current_user.is_admin)
 
 
 if __name__ == '__main__':

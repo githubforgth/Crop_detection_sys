@@ -52,7 +52,7 @@ class SQLConnector:
         return self.execute_query(query)
 
     def add_advice(self, disease_name, advice_content):
-        query = "INSERT INTO advice (disease_name, advice_content) VALUES (%s, %s)"
+        query = "INSERT INTO advice (title, content) VALUES (%s, %s)"
         data = (disease_name, advice_content)
         return self.execute_query(query, data)
 
@@ -78,6 +78,21 @@ class SQLConnector:
         sql_where = "WHERE " + ' AND '.join([f"{key} = %s" for key in where.keys()])
         sql = f"DELETE FROM {table} {sql_where}"
         self.execute_query(sql, list(where.values()))
+
+    def search_advices(self, query, page, per_page):
+        offset = (page - 1) * per_page
+        like_query = f"%{query}%"
+
+        advices = self.execute_query(
+            "SELECT * FROM advice WHERE title LIKE %s LIMIT %s OFFSET %s",
+            (like_query, per_page, offset)
+        )
+        total = self.execute_query(
+            "SELECT COUNT(*) AS total FROM advice WHERE title LIKE %s",
+            (like_query,)
+        )[0]['total']
+
+        return advices, total
 
     def __del__(self):
         self.cursor.close()

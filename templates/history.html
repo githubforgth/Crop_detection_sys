@@ -25,10 +25,10 @@
             <tbody>
                 {% for item in history_list %}
                 <tr>
-                    <td><img src="{{ item[0] }}" alt="pic"></td>
-                    <td>{{ item[2] }}</td>
-                    <td>{{ item[3] }}</td>
-                    <td>{{ item[4] }}</td>
+                    <td><img src="{{ item['pic_name'] }}" alt="pic"></td>
+                    <td>{{ item['timestamp'] }}</td>
+                    <td>{{ item['res'] }}</td>
+                    <td>{{ item['acc'] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

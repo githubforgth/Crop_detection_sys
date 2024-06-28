@@ -67,10 +67,10 @@
 <body>
 <div class="sidebar">
     <ul class="layui-nav layui-nav-tree" lay-filter="test">
-        <li class="layui-nav-item layui-nav-title"><a href="#">后台管理系统</a></li>
-        <li class="layui-nav-item"><a href="/">首页</a></li>
+        <li class="layui-nav-item layui-nav-title"><a href="/admin/manage-users">后台管理系统</a></li>
         <li class="layui-nav-item"><a href="{{ url_for('admin_bp.manage_users') }}">用户管理</a></li>
-        <li class="layui-nav-item"><a href="javascript:;">GitHub</a></li>
+        <li class="layui-nav-item"><a href="/">首页</a></li>
+        <li class="layui-nav-item"><a href="{{ url_for('admin_bp.add_advices') }}">写建议</a></li>
     </ul>
 </div>
 
@@ -163,28 +163,30 @@ layui.use(['form', 'layer', 'element'], function(){
         layer.open({
             type: 1,
             title: '添加新用户',
-            content: $('#user-modal'),
+            content: document.getElementById('user-modal'),
             area: ['500px', '400px']
         });
     });
 
     // 监听编辑按钮点击事件
-    $('.edit-btn').on('click', function() {
-        var id = $(this).data('userid');
-        var username = $(this).data('username');
-        var phone = $(this).data('phone');
-        var password = $(this).data('password');
+    document.querySelectorAll('.edit-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            var username = this.getAttribute('data-username');
+            var phone = this.getAttribute('data-phone');
+            var password = this.getAttribute('data-password');
 
-        $('#user_id').val(id);
-        $('#username').val(username);
-        $('#phone').val(phone);
-        $('#password').val(password);
+            document.getElementById('user_id').value = id;
+            document.getElementById('username').value = username;
+            document.getElementById('phone').value = phone;
+            document.getElementById('password').value = password;
 
-        layer.open({
-            type: 1,
-            title: '编辑用户',
-            content: $('#user-modal'),
-            area: ['500px', '400px']
+            layer.open({
+                type: 1,
+                title: '编辑用户',
+                content: document.getElementById('user-modal'),
+                area: ['500px', '400px']
+            });
         });
     });
 
